@@ -9,6 +9,9 @@ cd /home/swayer/Documents/doctorat-microservices/inscription-service
 cd /home/swayer/Documents/doctorat-microservices/gateway-service
 ./mvnw spring-boot:run &
 
+cd /home/swayer/Documents/doctorat-microservices/eureka-server
+./mvnw spring-boot:run &
+
 wait
 
 echo "All microservices are running."
