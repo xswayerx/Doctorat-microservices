@@ -49,6 +49,26 @@
             "projectName": "config-server",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-InscriptionServiceApplication<inscription-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.inscriptionservice.InscriptionServiceApplication",
+            "projectName": "inscription-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-InscriptionServiceApplication<inscription-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.devbuild.inscriptionservice.InscriptionServiceApplication",
+            "projectName": "inscription-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
