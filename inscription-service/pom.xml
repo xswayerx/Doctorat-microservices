@@ -35,6 +35,20 @@
             <artifactId>spring-cloud-config-client</artifactId>
             <version>4.3.0</version>
 		</dependency>
+        <!-- Spring Kafka (used both for @KafkaListener and Kafka Streams support) -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <!-- Kafka Streams API (used by Spring Kafka Streams) -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
