@@ -5,6 +5,7 @@ import com.devbuild.inscriptionservice.dto.*;
 import com.devbuild.inscriptionservice.enums.AnneeAcademique;
 import com.devbuild.inscriptionservice.enums.InscriptionStatus;
 import com.devbuild.inscriptionservice.enums.InscriptionType;
+import com.devbuild.inscriptionservice.dto.UserRole;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,36 +120,48 @@ public class InscriptionServiceImpl implements InscriptionService {
     log.info("Création d'une nouvelle inscription pour: {}", request.getDoctorantId());
 
     // Récupération et validation du doctorant
+    UserResponse doctorant;
     try {
         UserResponseWrapper wrapper = userClient.getUserById(request.getDoctorantId());
-        UserResponse doctorant = wrapper.getData();
-        validateUser(doctorant, "CANDIDAT");
+        doctorant = wrapper.getData();
+        // Un doctorant doit avoir le rôle DOCTORANT
+        validateUser(doctorant, UserRole.DOCTORANT);
     } catch (Exception e) {
         log.error("Erreur lors de la récupération du doctorant: {}", e.getMessage(), e);
         throw new RuntimeException("Doctorant non trouvé: " + request.getDoctorantId());
     }
 
     // Récupération et validation du directeur
+    UserResponse directeur;
     try {
         UserResponseWrapper directeurWrapper = userClient.getUserById(request.getDirecteurId());
-        UserResponse directeur = directeurWrapper.getData();
-        validateUser(directeur, "DIRECTEUR");
+        directeur = directeurWrapper.getData();
+        // Un directeur doit avoir le rôle DIRECTEUR_THESE
+        validateUser(directeur, UserRole.DIRECTEUR_THESE);
     } catch (Exception e) {
         log.error("Erreur lors de la récupération du directeur: {}", e.getMessage(), e);
         throw new RuntimeException("Directeur non trouvé: " + request.getDirecteurId());
     }
 
-    // Création de l’inscription
-    InscriptionDTO inscription = InscriptionDTO.builder()
+        // Création de l’inscription
+        LocalDateTime now = LocalDateTime.now();
+        InscriptionDTO inscription = InscriptionDTO.builder()
             .id(UUID.randomUUID().toString())
             .doctorantId(request.getDoctorantId())
+            .doctorantEmail(doctorant.getEmail())
+            .doctorantName(doctorant.getFirstName() + " " + doctorant.getLastName())
             .directeurId(request.getDirecteurId())
+            .directeurName("Pr. " + directeur.getFirstName() + " " + directeur.getLastName())
             .coDirecteurId(request.getCoDirecteurId())
             .type(request.getType())
+            // Une inscription nouvellement créée est considérée comme "soumise"
+            .status(InscriptionStatus.SOUMISE)
             .anneeAcademique(request.getAnneeAcademique())
             .sujetThese(request.getSujetThese())
             .laboratoire(request.getLaboratoire())
             .specialite(request.getSpecialite())
+            .dateCreation(now)
+            .dateModification(now)
             .build();
 
     // Stockage en mémoire
@@ -157,10 +170,19 @@ public class InscriptionServiceImpl implements InscriptionService {
 
     return inscription;
 }
-    private void validateUser(UserResponse user, String expectedRole) {
-        if (user == null) throw new RuntimeException("Utilisateur inexistant");
-        if (!user.getRole().equals(expectedRole)) throw new RuntimeException("Rôle incorrect");
-        if (!user.getStatus().equals("ACTIVE")) throw new RuntimeException("Utilisateur inactif");
+
+    private void validateUser(UserResponse user, UserRole expectedRole) {
+        if (user == null) {
+            throw new RuntimeException("Utilisateur inexistant");
+        }
+        if (user.getRole() == null || user.getRole() != expectedRole) {
+            throw new RuntimeException("Rôle incorrect: attendu " + expectedRole + " mais trouvé " + user.getRole());
+        }
+        // Le user-service renvoie le statut "ACTIF" (fr). On accepte aussi "ACTIVE" au cas où.
+        String status = user.getStatus();
+        if (status == null || !("ACTIF".equalsIgnoreCase(status) || "ACTIVE".equalsIgnoreCase(status))) {
+            throw new RuntimeException("Utilisateur inactif");
+        }
     }
 
 

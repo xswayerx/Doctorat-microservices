@@ -195,7 +195,10 @@ export class InscriptionListComponent implements OnInit {
     return labels[status] || status;
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: string | null | undefined): string {
+    if (!status) {
+      return 'inconnu';
+    }
     if (status.includes('ATTENTE')) return 'en-attente';
     if (status === 'VALIDEE' || status === 'APPROUVEE_DIRECTEUR') return 'approuvee';
     if (status === 'REJETEE') return 'rejetee';

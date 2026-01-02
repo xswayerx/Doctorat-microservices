@@ -3,10 +3,12 @@ package com.devbuild.inscriptionservice.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+// Doit être aligné avec com.enums.UserRole du user-service
 public enum UserRole {
+    CANDIDAT,
     DOCTORANT,
-    DIRECTEUR,
-    ADMIN;
+    DIRECTEUR_THESE,
+    PERSONNEL_ADMIN;
 
     // Permet à Jackson de transformer un String en enum
     @JsonCreator
